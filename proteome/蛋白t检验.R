@@ -96,10 +96,10 @@ protWAZ <- data.frame(pid=prot3,
                       padj=p3.adj)
 # FDR 以后差异显著
 protWAZ.adj <- protWAZ %>%
-  filter(padj<0.05) #n=39
+  filter(padj<0.05) #n=18
 # 原始 p 值
 protWAZ.p <- protWAZ %>%
-  filter(pval<0.05) #n=85
+  filter(pval<0.05) #n=72
 
 # 保存数据
 save(protWAZ,file = "data/蛋白组 WAZ T1和T3两组之间t检验.Rdata")

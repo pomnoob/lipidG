@@ -45,7 +45,8 @@ quesSel <- ques %>%
 # 合并脂质组学和问卷数据
 pomic <- inner_join(pomic_all,quesSel,by="id")
 pomicSel <- pomic %>%
-  filter(ageBaby > 40 & preterm == 1)
+  # 选取月龄不小于3且非早产
+  filter(ageBaby > 60 & preterm == 1)
 
 # 查看婴儿体重和身长数据是否有问题
 ## 体重
