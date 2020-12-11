@@ -9,7 +9,7 @@ library(pROC)
 # 先做 waz
 load(file = "data/proteomic-infant weight for age.Rdata")
 wazRF <- waz %>%
-  select(3:139,twaz)%>%
+  select(3:195,twaz)%>%
   mutate(twaz=factor(twaz,labels = c("T1","T3")))
 
 #missing value imputation
@@ -43,5 +43,5 @@ rfFit1
 rf.pred <- predict(rfFit1, testing, type="prob")
 
 
-result.roc <- roc(testing$twaz, rf.pred$T3)
+result.roc <- roc(testing$twaz, rf.pred$T1)
 plot(result.roc, print.thres="best", print.thres.best.method="closest.topleft")

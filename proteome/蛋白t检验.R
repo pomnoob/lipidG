@@ -8,12 +8,12 @@ library(tidyverse)
 # 2. 以 haz 的三分位为标准，T1和T3分别有42个样本
 
 # 策略1
-ldSel <- ldSel %>%
+pomicSel <- pomicSel %>%
   mutate(nhaz=case_when(haz > 1~1,
                         haz < -1~2))
-table(ldSel$nhaz)
+table(pomicSel$nhaz)
 # 选出发育迟缓和正常的数据
-haz1 <- ldSel %>%
+haz1 <- pomicSel %>%
   filter(nhaz == 1 | nhaz == 2)
 
 #t 检验
@@ -21,7 +21,7 @@ mean1_1 <- double()
 mean1_2 <- double()
 pvalue1 <- double()
 lipid1 <- character()
-for (i in 3:139) {
+for (i in 3:195) {
   # 做t检验
   t.result1 <- t.test(haz1[[i]]~haz1$nhaz,
                      na.action = na.omit)
@@ -29,22 +29,22 @@ for (i in 3:139) {
 }
 
 pvalue1
-p.adjust(pvalue1,method ="fdr" )
-
+p1.adj <- p.adjust(pvalue1,method ="fdr" )
+p1.adj[p1.adj<0.05]
 ##############################################################################
 
 # 策略2
-ldSel$thaz <- ntile(ldSel$haz,3)
-table(ldSel$thaz)
+pomicSel$thaz <- ntile(pomicSel$haz,3)
+table(pomicSel$thaz)
 # 选出T1和T2的数据
-haz2 <- ldSel %>%
+haz2 <- pomicSel %>%
   filter(thaz == 1 | thaz == 3)
 #t 检验
 mean2_1 <- double()
 mean2_3 <- double()
 pvalue2 <- double()
 lipid2 <- character()
-for (i in 3:139) {
+for (i in 3:195) {
   # 做t检验
   t.result2 <- t.test(haz2[[i]]~haz2$thaz,
                       na.action = na.omit)
@@ -52,33 +52,56 @@ for (i in 3:139) {
 }
 
 pvalue2
-p.adjust(pvalue2,method ="hommel" )
+p2.adj <- p.adjust(pvalue2,method ="fdr" )
+p2.adj[p2.adj<0.05]
 
-save(haz1,file="data/infant length for age strategy 1.Rdata")
-save(haz2,file="data/infant length for age strategy 2.Rdata")
+save(haz1,file="data/proteomic-infant length for age strategy 1.Rdata")
+save(haz2,file="data/proteomic-infant length for age strategy 2.Rdata")
 
 ##############################################################################
 ##############################################################################
 
 # 体重以三分位为标准进行分析
-ldSel$twaz <- ntile(ldSel$waz,3)
-table(ldSel$twaz)
+pomicSel$twaz <- ntile(pomicSel$waz,3)
+table(pomicSel$twaz)
 # 选出T1和T2的数据
-waz <- ldSel %>%
+waz <- pomicSel %>%
   filter(twaz == 1 | twaz == 3)
 # 保存数据
-save(waz,file = "data/infant weight for age.Rdata")
+save(waz,file = "data/proteomic-infant weight for age.Rdata")
 #t 检验
 mean3_1 <- double()
 mean3_3 <- double()
 pvalue3 <- double()
-lipid3 <- character()
-for (i in 3:139) {
+prot3 <- character()
+colnameWAZ <- colnames(waz)
+for (i in 3:195) {
   # 做t检验
   t.result3 <- t.test(waz[[i]]~waz$twaz,
                       na.action = na.omit)
   pvalue3[length(pvalue3)+1] <- t.result3[["p.value"]]
+  mean3_1[length(mean3_1)+1] <- t.result3[["estimate"]][["mean in group 1"]]
+  mean3_3[length(mean3_3)+1] <- t.result3[["estimate"]][["mean in group 3"]]
+  prot3[length(prot3)+1] <- colnameWAZ[i]
 }
 
-pvalue3
-p.adjust(pvalue3,method ="fdr" )
+p3.adj <- p.adjust(pvalue3,method ="fdr" )
+p3.adj[p3.adj<0.05]
+
+# 筛选出差异显著的蛋白质
+protWAZ <- data.frame(pid=prot3,
+                      mean_T1=mean3_1,
+                      mean_T3=mean3_3,
+                      pval=pvalue3,
+                      padj=p3.adj)
+# FDR 以后差异显著
+protWAZ.adj <- protWAZ %>%
+  filter(padj<0.05) #n=39
+# 原始 p 值
+protWAZ.p <- protWAZ %>%
+  filter(pval<0.05) #n=85
+
+# 保存数据
+save(protWAZ,file = "data/蛋白组 WAZ T1和T3两组之间t检验.Rdata")
+save(protWAZ.adj,file = "data/FDR校正后差异显著的蛋白质 WAZ T1和T3两组之间t检验.Rdata")
+save(protWAZ.p,file = "data/不做校正差异显著的蛋白质 WAZ T1和T3两组之间t检验.Rdata")

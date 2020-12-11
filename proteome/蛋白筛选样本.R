@@ -3,22 +3,9 @@ library(zscorer)
 # 导入之前整理好的脂质组学数据
 # 仍然没有哈尔滨和郑州的数据
 # 因为这两个城市的样本id与检测数据没法一一对应
-pomic_all <- read.csv("data/ldomic_all.csv",stringsAsFactors = F)
-pomic_all <- ldomic_all %>%
+pomic_all <- read.csv("data/pomics_20.csv",stringsAsFactors = F)
+pomic_all <- pomic_all  %>%
   rename(id=sample)
-
-
-# 去掉NA超过20%的脂质数据
-
-ld <- ldomic_all[c(1,2)]
-
-for (i in 3:160) {
-  
-  if (sum(is.na(ldomic_all[,i]))<32){
-    ld <- cbind(ld,ldomic_all[i])
-  }
-  
-}
 
 # 导入问卷数据
 ques <- read.csv(file = "data/Metadata of breastmilk questionnaire.csv",stringsAsFactors = F)
@@ -56,32 +43,25 @@ quesSel <- ques %>%
          birthWeight=B1,birthLength=B2,preterm=B3)
 
 # 合并脂质组学和问卷数据
-ldomic <- inner_join(ld,quesSel,by="id")
-ldSel <- ldomic %>%
+pomic <- inner_join(pomic_all,quesSel,by="id")
+pomicSel <- pomic %>%
   filter(ageBaby > 40 & preterm == 1)
 
 # 查看婴儿体重和身长数据是否有问题
 ## 体重
-hist(ldSel$babyWeight)
-summary(ldSel$babyWeight)
-boxplot(ldSel$babyWeight)# 有一个大于60的数据点，去掉
-ldSel$babyWeight[ldSel$babyWeight > 60] <- NA
 
-## 身高
-hist(ldSel$babyLength)
-summary(ldSel$babyLength)
-boxplot(ldSel$babyLength)
+pomicSel$babyWeight[pomicSel$babyWeight > 60] <- NA
 
 
 
 # 计算 z 评分
-ldSel <- addWGSR(data = ldSel, sex = "sex", firstPart = "babyWeight",
+pomicSel <- addWGSR(data = pomicSel, sex = "sex", firstPart = "babyWeight",
                   secondPart = "ageBaby", index = "wfa",output = "waz")
 
-ldSel <- addWGSR(data = ldSel, sex = "sex", firstPart = "babyLength",
+pomicSel <- addWGSR(data = pomicSel, sex = "sex", firstPart = "babyLength",
                   secondPart = "ageBaby", index = "hfa",output = "haz")
 
-boxplot(ldSel$waz)
-boxplot(ldSel$haz)
+boxplot(pomicSel$waz)
+boxplot(pomicSel$haz)
 
-save(ldSel,file = "data/selected lipidomic samples.Rdata")
+save(pomicSel,file = "data/selected proteomic samples.Rdata")
