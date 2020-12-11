@@ -66,7 +66,8 @@ table(ldSel$twaz)
 # 选出T1和T2的数据
 waz <- ldSel %>%
   filter(twaz == 1 | twaz == 3)
-
+# 保存数据
+save(waz,file = "data/infant weight for age.Rdata")
 #t 检验
 mean3_1 <- double()
 mean3_3 <- double()
