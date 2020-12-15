@@ -44,25 +44,30 @@ quesSel <- ques %>%
 
 # 合并脂质组学和问卷数据
 pomic <- inner_join(pomic_all,quesSel,by="id")
+
+# 查看是否有身高、体重异常的样本
+boxplot(pomic$babyWeight) 
+# 有两个体重大于60的样本，设为NA
+pomic$babyWeight[pomic$babyWeight > 60] <- NA
+# 身高无异常值
+boxplot(pomic$babyLength)
+
+# 计算 z 评分
+pomic <- addWGSR(data = pomic, sex = "sex", firstPart = "babyWeight",
+                 secondPart = "ageBaby", index = "wfa",output = "waz")
+
+pomic <- addWGSR(data = pomic, sex = "sex", firstPart = "babyLength",
+                 secondPart = "ageBaby", index = "hfa",output = "haz")
+
+# 筛选样本
 pomicSel <- pomic %>%
   # 选取月龄不小于3且非早产
   filter(ageBaby > 60 & preterm == 1)
 
-# 查看婴儿体重和身长数据是否有问题
-## 体重
-
-pomicSel$babyWeight[pomicSel$babyWeight > 60] <- NA
-
+# 只排除早产儿
+pomic.p <- pomic %>%
+  filter(preterm==1)
 
 
-# 计算 z 评分
-pomicSel <- addWGSR(data = pomicSel, sex = "sex", firstPart = "babyWeight",
-                  secondPart = "ageBaby", index = "wfa",output = "waz")
-
-pomicSel <- addWGSR(data = pomicSel, sex = "sex", firstPart = "babyLength",
-                  secondPart = "ageBaby", index = "hfa",output = "haz")
-
-boxplot(pomicSel$waz)
-boxplot(pomicSel$haz)
-
+save(pomic.p,file="data/selected proteomic samples without preterm.Rdata")
 save(pomicSel,file = "data/selected proteomic samples.Rdata")
