@@ -44,6 +44,8 @@ quesSel <- ques %>%
 
 # 合并脂质组学和问卷数据
 pomic <- inner_join(pomic_all,quesSel,by="id")
+write.csv(pomic,file = "proteome for growth.csv",
+          row.names = F)
 
 # 查看是否有身高、体重异常的样本
 boxplot(pomic$babyWeight) 
