@@ -1,24 +1,26 @@
-# 选择所有非早产儿样本
-
-load(file = "data/selected proteomic samples without preterm.Rdata")
+# 用 MetaboAnalystR分析后发现北京的样本有异常，去掉以后再看结果
 library(tidyverse)
-##############################################################################
-##############################################################################
+load(file = "data/selected proteomic samples without preterm.Rdata")
+pomic.bjout <- pomic.p %>%
+  filter(city != "北京")
 
 # haz分析策略
 # 1. 以 haz 绝对值为标准，大于1为发育正常，小于-1为发育迟缓，n分别为44和24
 # 2. 以 haz 的三分位为标准，T1和T3分别有42个样本
 
 # 策略1
-pomic.p <- pomic.p %>%
+pomic.bjout <- pomic.bjout %>%
   mutate(nhaz=case_when(haz > 1~1,
                         haz < -1~2))
-table(pomic.p$nhaz)
+table(pomic.bjout$nhaz)
 # 选出发育迟缓和正常的数据
-haz1 <- pomic.p %>%
+haz1 <- pomic.bjout %>%
   filter(nhaz == 1 | nhaz == 2)
 # 检查各个蛋白质分布情况
-write.csv(haz1,file = "data/HAZ proteome without preterm 1 and -1.csv",
+haz1.exp <- haz1 %>%
+  select(id,nhaz,3:195) %>%
+  rename(group=nhaz)
+write.csv(haz1.exp,file = "data/HAZ proteome without preterm 1 and -1 no beijing.csv",
           row.names = F)
 #t 检验
 mean1_1 <- double()
@@ -28,7 +30,7 @@ lipid1 <- character()
 for (i in 3:195) {
   # 做t检验
   t.result1 <- t.test(haz1[[i]]~haz1$nhaz,
-                     na.action = na.omit)
+                      na.action = na.omit)
   pvalue1[length(pvalue1)+1] <- t.result1[["p.value"]]
 }
 
@@ -38,10 +40,10 @@ p1.adj[p1.adj<0.05]
 ##############################################################################
 
 # 策略2
-pomic.p$thaz <- ntile(pomic.p$haz,3)
-table(pomic.p$thaz)
+pomic.bjout$thaz <- ntile(pomic.bjout$haz,3)
+table(pomic.bjout$thaz)
 # 选出T1和T2的数据
-haz2 <- pomic.p %>%
+haz2 <- pomic.bjout %>%
   filter(thaz == 1 | thaz == 3)
 #t 检验
 mean2_1 <- double()
@@ -58,16 +60,22 @@ for (i in 3:195) {
 pvalue2
 p2.adj <- p.adjust(pvalue2,method ="fdr" )
 p2.adj[p2.adj<0.05]
-
+# 导出数据
+haz2.exp <- haz2 %>%
+  select(id, thaz, 3:195) %>%
+  rename(sample = id,
+         group = thaz)
+write.csv(haz2.exp,file = "data/HAZ proteome without preterm T1 and T3.csv",
+          row.names = F)
 ##############################################################################
 ##############################################################################
 
 # 体重以三分位为标准进行分析
-pomic.p$twaz <- ntile(pomic.p$waz,3)
-table(pomic.p$twaz)
+pomic.bjout$twaz <- ntile(pomic.bjout$waz,3)
+table(pomic.bjout$twaz)
 
 # 选出T1和T2的数据
-waz.p <- pomic.p %>%
+waz.p <- pomic.bjout %>%
   filter(twaz == 1 | twaz == 3)
 # 保存数据
 save(waz.p,file = "data/proteomic-infant weight for age without preterm.Rdata")
@@ -97,10 +105,10 @@ p3.adj[p3.adj<0.05]
 
 # 筛选出差异显著的蛋白质
 protWAZ.p <- data.frame(pid=prot3,
-                      mean_T1=mean3_1,
-                      mean_T3=mean3_3,
-                      pval=pvalue3,
-                      padj=p3.adj)
+                        mean_T1=mean3_1,
+                        mean_T3=mean3_3,
+                        pval=pvalue3,
+                        padj=p3.adj)
 
 # FDR 以后差异显著
 protWAZpre.adj <- protWAZ.p %>%
@@ -117,13 +125,13 @@ save(protWAZpre.p,file = "data/不做校正差异显著的蛋白质 WAZ T1和T3�
 
 
 # 以waz大于1或小于-1为标准
-pomicSel <- pomicSel %>%
+pomic.bjout <- pomic.bjout %>%
   mutate(nwaz=case_when(waz > 1~1,
                         waz < -1~2))
-table(pomicSel$nwaz)
+table(pomic.bjout$nwaz)
 
 # 选出1和2的数据
-nwaz <- pomicSel %>%
+nwaz <- pomic.bjout %>%
   filter(nwaz == 1 | nwaz == 2)
 # 保存数据
 save(nwaz,file = "data/proteomic-infant weight for age 1 and -1.Rdata")
@@ -149,10 +157,10 @@ p4.adj[p4.adj<0.05]
 
 # 筛选出差异显著的蛋白质
 protWAZ.n <- data.frame(pid=prot4,
-                      mean1=mean4_1,
-                      mean2=mean4_3,
-                      pval=pvalue4,
-                      padj=p4.adj)
+                        mean1=mean4_1,
+                        mean2=mean4_3,
+                        pval=pvalue4,
+                        padj=p4.adj)
 # FDR 以后差异显著
 protWAZ.adj.n <- protWAZ.n %>%
   filter(padj<0.05) #n=18
