@@ -1,16 +1,21 @@
+library(MetaboAnalystR)
 mSet<-InitDataObjects("conc", "stat", FALSE)
-mSet<-Read.TextData(mSet, "Replacing_with_your_file_path", "rowu", "disc");
+mSet<-Read.TextData(mSet, "data/WAZ proteome without preterm 1 and -1.csv", "rowu", "disc")
 mSet<-SanityCheckData(mSet)
 mSet<-RemoveMissingPercent(mSet, percent=0.5)
-mSet<-ImputeMissingVar(mSet, method="knn_var")
+mSet<-ImputeVar(mSet, method="knn")
 mSet<-PreparePrenormData(mSet)
-mSet<-Normalization(mSet, "QuantileNorm", "LogNorm", "ParetoNorm", ratio=FALSE, ratioNum=20)
-mSet<-PlotNormSummary(mSet, "norm_0_", "png", 72, width=NA)
+mSet<-Normalization(mSet, "QuantileNorm", "LogNorm", "ParetoNorm")
+
+# 导出标准化后的数据
+prot.norm <- mSet$dataSet[["norm"]]
+write.csv(prot.norm,file = "data/Metabotype标准化后的数据.csv")
+mSet<-PlotNormSummary(mSet, "figures/normalization result", "png", 72, width=NA)
 mSet<-PlotSampleNormSummary(mSet, "snorm_0_", "png", 72, width=NA)
 mSet<-Volcano.Anal(mSet, FALSE, 2.0, 0, 0.75,F, 0.1, TRUE, "raw")
-mSet<-PlotVolcano(mSet, "volcano_0_",1, "png", 72, width=NA)
+mSet<-PlotVolcano(mSet, "figures/volcano plot",1, "png", 72, width=NA)
 mSet<-Volcano.Anal(mSet, FALSE, 1.5, 0, 0.75,F, 0.1, TRUE, "fdr")
-mSet<-PlotVolcano(mSet, "volcano_1_",1, "png", 72, width=NA)
+mSet<-PlotVolcano(mSet, "figures/volcano plot 2",1, "png", 72, width=NA)
 mSet<-PLSR.Anal(mSet, reg=TRUE)
 mSet<-PlotPLSPairSummary(mSet, "pls_pair_0_", "png", 72, width=NA, 5)
 mSet<-PlotPLS2DScore(mSet, "pls_score2d_0_", "png", 72, width=NA, 1,2,0.95,0,0)
