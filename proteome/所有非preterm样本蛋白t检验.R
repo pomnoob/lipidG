@@ -18,7 +18,8 @@ table(pomic.p$nhaz)
 haz1 <- pomic.p %>%
   filter(nhaz == 1 | nhaz == 2)
 # 检查各个蛋白质分布情况
-
+write.csv(haz1,file = "data/HAZ proteome without preterm 1 and -1.csv",
+          row.names = F)
 #t 检验
 mean1_1 <- double()
 mean1_2 <- double()
@@ -158,3 +159,33 @@ protWAZ.adj.n <- protWAZ.n %>%
 # 原始 p 值
 protWAZ.pn <- protWAZ.n %>%
   filter(pval<0.05) #n=72
+
+# 以体重大于1或小于-1为标准
+pomic.p <- pomic.p %>%
+  mutate(nwaz=case_when(waz > 1~1,
+                        waz < -1~2))
+table(pomic.p$nwaz)
+# 选出发育迟缓和正常的数据
+waz2.p <- pomic.p %>%
+  filter(nwaz == 1 | nwaz == 2)
+#t 检验
+mean5_1 <- double()
+mean5_3 <- double()
+pvalue5 <- double()
+prot5 <- character()
+colnameWAZ <- colnames(waz2.p)
+for (i in 3:195) {
+  # 做t检验
+  t.result5 <- t.test(waz2.p[[i]]~waz2.p$nwaz,
+                      na.action = na.omit)
+  pvalue5[length(pvalue5)+1] <- t.result5[["p.value"]]
+  mean5_1[length(mean5_1)+1] <- t.result5[["estimate"]][["mean in group 1"]]
+  mean5_3[length(mean5_3)+1] <- t.result5[["estimate"]][["mean in group 2"]]
+  prot5[length(prot5)+1] <- colnameWAZ[i]
+}
+
+p5.adj <- p.adjust(pvalue5,method ="fdr" )
+p5.adj[p5.adj<0.05]
+
+write.csv(waz2.p,file = "data/WAZ proteome without preterm 1 and -1.csv",
+          row.names = F)
