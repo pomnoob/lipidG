@@ -58,7 +58,13 @@ for (i in 3:195) {
 pvalue2
 p2.adj <- p.adjust(pvalue2,method ="fdr" )
 p2.adj[p2.adj<0.05]
-
+# 导出数据
+haz2.exp <- haz2 %>%
+  select(id, thaz, 3:195) %>%
+  rename(sample = id,
+         group = thaz)
+write.csv(haz2.exp,file = "data/HAZ proteome without preterm T1 and T3.csv",
+          row.names = F)
 ##############################################################################
 ##############################################################################
 
