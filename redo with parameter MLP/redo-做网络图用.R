@@ -43,5 +43,5 @@ result.gene <- left_join(result,pro.id,by="feature")
 result.sig <- result.gene %>%
   filter(vip>1 & (fc >= 1.5 | fc< 0.67))
 # 导出CSV,用 Crytoscape进行网络分析
-write.csv(pSel.gene,file = "data/all protein with vip and fc for network.csv",
+write.csv(result.sig,file = "redo with parameter MLP/all protein with vip etc for network.csv",
           row.names = F)
