@@ -112,8 +112,9 @@ write.csv(pomic.expm,file = "WAZ T1toT3 all proteins no preterm not mixed feedin
 
 # 使用 Normalyzer 进行标准化
 library(Normalyzer)
+library(grid)
 Normalyzer::normalyzer("NormalyzerDE/data for normalyzer.txt",
-                       "proteome_norm2") # 无法生成 PDF
+                       "proteome_norm3") # 无法生成 PDF
 
 
 # 使用 NormalyzerDE
