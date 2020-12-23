@@ -110,6 +110,7 @@ pomic.expm <- pomic.pmp %>%
 
 write.csv(pomic.expm,file = "WAZ T1toT3 all proteins no preterm not mixed feeding.csv",row.names = F)
 
+# 这个文件需要重新弄一下
 data <- read.csv(file = "data_processed_norm.csv",stringsAsFactors = F,header = F)
 
 write.table(data,file = "data for normalyzer.txt",sep = "\t",quote = F,col.names = F,row.names = F)
