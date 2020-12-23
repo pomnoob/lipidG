@@ -97,6 +97,13 @@ pomicSel <- pomic %>%
 pomic.p <- pomic %>%
   filter(preterm==1)
 
+
+
+# 三分位
+pomic.p$twaz <- ntile(pomic.p$waz,3)
+table(pomic.p$twaz)
+
+
 # 策略1
 pomic.p <- pomic.p %>%
   mutate(nwaz=case_when(waz > 1~1,
@@ -119,14 +126,26 @@ waz1.m <- waz1 %>%
 
 table(waz1.m$nwaz)
 
-
+# 导出1 和-1
 pomic.expm <- pomic.pm %>%
   select(id,nwaz,2:473) %>%
   rename(group=nwaz)
 
+# 导出三分位
+pomic.expmt <- pomic.pm %>%
+  select(id,twaz,2:473) %>%
+  rename(group=twaz)
+
+# 导出三分位T1heT3
+wazT <- pomic.expmt %>%
+  filter(group ==1 | group ==3)
+
 pomic.exp <- pomic.p %>%
   select(id,nwaz,2:473) %>%
   rename(group=nwaz)
+
+write.csv(pomic.expmt,file = "data/WAZ tertile all proteins no preterm not mixed feeding.csv",row.names = F)
+write.csv(wazT,file = "data/WAZ tertile 1&3 all proteins no preterm not mixed feeding.csv",row.names = F)
 
 write.csv(pomic.expm,file = "data/WAZ all proteins no preterm not mixed feeding.csv",row.names = F)
 write.csv(pomic.exp,file = "data/WAZ all proteins no preterm.csv",row.names = F)
