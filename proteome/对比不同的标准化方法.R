@@ -110,10 +110,30 @@ pomic.expm <- pomic.pmp %>%
 
 write.csv(pomic.expm,file = "WAZ T1toT3 all proteins no preterm not mixed feeding.csv",row.names = F)
 
-# 这个文件需要重新弄一下
-data <- read.csv(file = "data_processed_norm.csv",stringsAsFactors = F,header = F)
-
-write.table(data,file = "data for normalyzer.txt",sep = "\t",quote = F,col.names = F,row.names = F)
-
+# 使用 Normalyzer 进行标准化
 library(Normalyzer)
-normalyzer(data)
+Normalyzer::normalyzer("NormalyzerDE/data for normalyzer.txt",
+                       "proteome_norm2") # 无法生成 PDF
+
+
+# 使用 NormalyzerDE
+library(NormalyzerDE)
+data_mat <- read.csv(file = "NormalyzerDE/Data matrix.csv",stringsAsFactors = F,header = F)
+design_mat <- read.csv(file = "NormalyzerDE/Design matrix.csv",stringsAsFactors = F,header = F)
+# 导出为txt文件
+write.table(data_mat,file = "NormalyzerDE/Data matrix.txt",sep = "\t",quote = F,col.names = F,row.names = F)
+write.table(design_mat,file = "NormalyzerDE/Design matrix.txt",sep = "\t",quote = F,col.names = F,row.names = F)
+
+# 标准化数据
+normalyzer("proteome_norm2",
+             designPath = "NormalyzerDE/Design matrix.txt",
+             dataPath = "NormalyzerDE/Data matrix.txt",
+             outputDir = "NormalyzerDE/output") # 有数值低于1，无法进行后续分析
+
+
+normalyzerDE("proteome_norm2",
+                         designPath = "NormalyzerDE/Design matrix.txt",
+                         dataPath = "NormalyzerDE/Data matrix.txt",
+                         outputDir = "NormalyzerDE/output",
+             comparisons = c("1-2", "1-3"))
+
