@@ -138,3 +138,26 @@ normalyzerDE("proteome_norm2",
                          outputDir = "NormalyzerDE/output",
              comparisons = c("1-2", "1-3"))
 
+
+# 使用MetaboAnalyst进行Cube root transformation 后使用 NormalyzerDE
+library(NormalyzerDE)
+data_mat.c <- read.csv(file = "NormalyzerDE/Data matrix cubic norm.csv",stringsAsFactors = F,header = F)
+design_mat.c <- read.csv(file = "NormalyzerDE/Design matrix cubic norm.csv",stringsAsFactors = F,header = F)
+# 导出为txt文件
+write.table(data_mat.c,file = "NormalyzerDE/Data matrix cubic norm.txt",sep = "\t",quote = F,col.names = F,row.names = F)
+write.table(design_mat.c,file = "NormalyzerDE/Design matrix cubic norm.txt",sep = "\t",quote = F,col.names = F,row.names = F)
+
+# 标准化数据
+normalyzer("proteome_norm2",
+           designPath = "NormalyzerDE/Design matrix cubic norm.txt",
+           dataPath = "NormalyzerDE/Data matrix cubic norm.txt",
+           outputDir = "NormalyzerDE/output",
+           noLogTransform = T) # 有数值低于1，无法进行后续分析
+
+
+normalyzerDE("proteome_norm2",
+             designPath = "NormalyzerDE/Design matrix.txt",
+             dataPath = "NormalyzerDE/Data matrix.txt",
+             outputDir = "NormalyzerDE/output",
+             comparisons = c("1-2", "1-3"))
+

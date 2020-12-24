@@ -1,0 +1,14 @@
+
+###Warning messages for VSN-G###
+vsn2: 268 x 114 matrix (1 stratum). 
+Please use 'meanSdPlot' to verify the fit.
+Warning in rlm.default(x, y, weights, method = method, wt.method = wt.method,  :
+  'rlm' failed to converge in 20 steps
+
+###Warning messages for VSN-R###
+vsn2: 268 x 38 matrix (1 stratum). 
+Please use 'meanSdPlot' to verify the fit.
+vsn2: 268 x 38 matrix (1 stratum). 
+Please use 'meanSdPlot' to verify the fit.
+vsn2: 268 x 38 matrix (1 stratum). 
+Please use 'meanSdPlot' to verify the fit.
