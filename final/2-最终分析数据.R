@@ -92,6 +92,7 @@ prot_norm <- prot_norm %>%
 
 prot.all <- left_join(prot_norm,pomic.char,by="id")
 
+################################################################################
 # 准备回归模型的相关参数
 
 # 蛋白质id
@@ -159,6 +160,9 @@ prot.vip.sig <- left_join(pls.vip,lm.result,by="feature")
 prot.vip.sig.cut <- prot.vip.sig %>%
   filter(vip > 2 | fdr < 0.05)
 
+prot.vip.sig.cut.2 <- prot.vip.sig %>%
+  filter(vip > 2 & fdr < 0.05)
+
 # 导入之前做好的蛋白质ID转Gene ID的文件和代码
 pro.id <- read.csv(file = "data/protein id to name.csv",stringsAsFactors = F)
 
@@ -170,9 +174,14 @@ pro.id$pname <- str_replace_all(pro.id$pname,
 pro.id$pname <- str_to_title(pro.id$pname)
 
 prot.vip.sig.cut <- left_join(prot.vip.sig.cut,pro.id,by="feature")
+prot.vip.sig.cut.2 <- left_join(prot.vip.sig.cut.2,pro.id,by="feature")
 
 write.csv(prot.vip.sig.cut,
           file = "final/VIP大于2或FDR小于0.05的蛋白质.csv",
+          row.names = F)
+
+write.csv(prot.vip.sig.cut.2,
+          file = "final/VIP大于2且FDR小于0.05的蛋白质.csv",
           row.names = F)
 
 ################################################################################
@@ -180,6 +189,7 @@ write.csv(prot.vip.sig.cut,
 # 根据原始浓度数据绘制图
 # 需要绘制图片和列出的蛋白质
 feature <- prot.vip.sig.cut$feature
+feature2 <- prot.vip.sig.cut.2$gname
 
 # 准备数据
 prot.orig <- read.csv(file = "final/Metab_data_processed_t.csv",stringsAsFactors = F)
@@ -221,8 +231,43 @@ ggsave(filename = "final/蛋白质浓度图.svg",
        height = 20,
        dpi = 75)
   
+################################################################################
+# 选择VIP>2且FDR<0.05的蛋白质，在Excel 中调整数据格式，画柱状图
+data.barp <- read.csv(file = "final/画图数据.csv",stringsAsFactors = F)
+data.barp2 <- data.barp %>%
+  filter(feature %in% feature2)
+# 画图
+conc.protein2 <- ggplot(data=data.barp2)+
+  geom_bar(aes(x=as.factor(group),y=mean,fill=as.factor(group)),stat = "identity",width = 0.5,color="black")+
+  geom_errorbar(aes(x=as.factor(group), ymin=mean,ymax=mean+sd),
+                width=0.4, alpha=0.9)+
+  facet_wrap(~feature,scales = "free",nrow=4)+
+  scale_fill_grey(start = 0.4,end = 0.9,labels=c("Tertile 1", "Tertile 2", "Tertile 3"))+theme_minimal()+
+  theme(
+    strip.text = element_text(size=15),
+    panel.border  = element_rect(color = "black",
+                                 fill=NA),
+    axis.title = element_text(size=15),
+    axis.text = element_text(size=15),
+    legend.title = element_text(size=15),
+    legend.text = element_text(size=15),
+    legend.position = "bottom"
+  )+
+  xlab("Tertile of WAZ")+
+  ylab("One Ten Thousandth of Total Protein")+
+  labs(fill="Tertile of WAZ ")
+conc.protein2
+
+# 导出 SVG 图片
+ggsave(filename = "final/蛋白质浓度图-VIP大于2且FDR小于0.05.svg",
+       conc.protein2,
+       width = 10,
+       height = 8,
+       dpi = 75)
 
 ###############################################################################
+# 尝试做 boxplot，效果不是很好
+
 prot.orig.plot <- prot.orig %>%
   select(id,group,all_of(feature))
 
