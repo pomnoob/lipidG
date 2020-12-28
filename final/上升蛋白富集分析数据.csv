@@ -1,0 +1,40 @@
+"# background genes","# genes","category","chart color","description","FDR value","genes","network.SUID","nodes.SUID","p-value","PMID","term name","transferred FDR value","year"
+"34","8","NetworkNeighborAL","","azurophil granule lumen","9.07E-19","STK11IP|C6orf120|CREG1|PADI2|NHLRC3|CPPED1|PLAC8|HEBP2","609","663|660|620|668|661|669|666|664","3.63E-20","","CL.10362","1.8042392712939903","0"
+"92","8","GO Component","#be989c","azurophil granule lumen","3.35E-15","STK11IP|C6orf120|CREG1|PADI2|NHLRC3|CPPED1|PLAC8|HEBP2","609","663|660|620|668|661|669|666|664","5.67E-17","","GO.0035578","1.4474955192963155","0"
+"29","5","NetworkNeighborAL","","azurophil granule lumen","2.66E-11","C6orf120|CREG1|PADI2|CPPED1|PLAC8","609","660|620|668|669|666","5.33E-12","","CL.10364","1.0575118363368934","0"
+"471","8","Reactome Pathways","","Neutrophil degranulation","9.38E-11","STK11IP|C6orf120|CREG1|PADI2|NHLRC3|CPPED1|PLAC8|HEBP2","609","663|660|620|668|661|669|666|664","1.88E-11","","HSA-6798695","1.0027797161620935","0"
+"485","8","GO Process","#66c2a5","neutrophil degranulation","3.69E-9","STK11IP|C6orf120|CREG1|PADI2|NHLRC3|CPPED1|PLAC8|HEBP2","609","663|660|620|668|661|669|666|664","2.36E-11","","GO.0043312","0.8432973633840939","0"
+"774","9","GO Process","#db9971","exocytosis","3.69E-9","SNX19|STK11IP|C6orf120|CREG1|PADI2|NHLRC3|CPPED1|PLAC8|HEBP2","609","662|663|660|620|668|661|669|666|664","1.28E-11","","GO.0006887","0.8432973633840939","0"
+"24","4","NetworkNeighborAL","","azurophil granule lumen","4.57E-9","C6orf120|CREG1|PADI2|CPPED1","609","660|620|668|669","1.1E-9","","CL.10367","0.834008379993015","0"
+"2226","9","GO Component","","cytoplasmic vesicle","6.53E-7","SNX19|STK11IP|C6orf120|CREG1|PADI2|NHLRC3|CPPED1|PLAC8|HEBP2","609","662|663|660|620|668|661|669|666|664","1.44E-7","","GO.0031410","0.6185086818724926","0"
+"2505","8","GO Component","","extracellular region","3.09E-5","STK11IP|C6orf120|CREG1|PADI2|NHLRC3|CPPED1|PLAC8|HEBP2","609","663|660|620|668|661|669|666|664","8.39E-6","","GO.0005576","0.45100415205751654","0"
+"11","2","NetworkNeighborAL","","mixed, incl. neutrophil mediated killing of bacterium, and Pancreatic ribonuclease","7.97E-5","PADI2|CPPED1","609","668|669","2.23E-5","","CL.10369","0.40985416786038875","0"
+"4347","9","GO Component","#f3d05c","endomembrane system","1.6E-4","SNX19|STK11IP|C6orf120|CREG1|PADI2|NHLRC3|CPPED1|PLAC8|HEBP2","609","662|663|660|620|668|661|669|666|664","4.68E-5","","GO.0012505","0.3795880017344075","0"
+"12193","11","GO Component","#adcf60","intracellular organelle","0.0155","SNX19|MPZL2|STK11IP|C6orf120|RCSD1|CREG1|PADI2|NHLRC3|CPPED1|PLAC8|HEBP2","609","662|665|663|660|667|620|668|661|669|666|664","0.0055","","GO.0043229","0.18096683018297086","0"
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,

@@ -86,11 +86,15 @@ chisq.test(chi.edu) # p=0.00042
 # 合并数据
 prot_norm <- read.csv("final/Metab_data_normalized_t.csv",
                       stringsAsFactors = F)
+# 蛋白质去重
+prot_norm <- prot_norm %>%
+  select(-contains("25786"))
 
 prot_norm <- prot_norm %>%
   dplyr::rename(id=sample)
 
-prot.all <- left_join(prot_norm,pomic.char,by="id")
+prot.all <- inner_join(prot_norm,pomic.char,by="id")
+
 
 ################################################################################
 # 准备回归模型的相关参数
@@ -143,6 +147,21 @@ lm.result <- data.frame(feature=prot.name,
 # 校正p值
 lm.result$fdr <- p.adjust(lm.result$p,method = "fdr")
 
+# 导入之前做好的蛋白质ID转Gene ID的文件和代码
+pro.id <- read.csv(file = "data/protein id to name.csv",stringsAsFactors = F)
+
+# refine the names
+pro.id$gname <- toupper(pro.id$gname)
+pro.id$pname <- str_replace_all(pro.id$pname,
+                                "\\([[:upper:]][[:upper:][:digit:]]*\\)",
+                                "")
+pro.id$pname <- str_to_title(pro.id$pname)
+
+# 加入gene id
+
+lm.result <- inner_join(lm.result,pro.id,by="feature")
+
+
 # 提取fdr<0.05的数据
 lm.result.sig <- lm.result %>%
   filter(fdr<0.05)
@@ -157,21 +176,17 @@ pls.vip <- pls.vip %>%
 
 prot.vip.sig <- left_join(pls.vip,lm.result,by="feature")
 
+# VIP 大于 2 或 FDR < 0.05
 prot.vip.sig.cut <- prot.vip.sig %>%
   filter(vip > 2 | fdr < 0.05)
 
+# VIP 大于2 且 FDR < 0.05
 prot.vip.sig.cut.2 <- prot.vip.sig %>%
   filter(vip > 2 & fdr < 0.05)
 
-# 导入之前做好的蛋白质ID转Gene ID的文件和代码
-pro.id <- read.csv(file = "data/protein id to name.csv",stringsAsFactors = F)
+# 
 
-# refine the names
-pro.id$gname <- toupper(pro.id$gname)
-pro.id$pname <- str_replace_all(pro.id$pname,
-                                "\\([[:upper:]][[:upper:][:digit:]]*\\)",
-                                "")
-pro.id$pname <- str_to_title(pro.id$pname)
+
 
 prot.vip.sig.cut <- left_join(prot.vip.sig.cut,pro.id,by="feature")
 prot.vip.sig.cut.2 <- left_join(prot.vip.sig.cut.2,pro.id,by="feature")
@@ -190,18 +205,56 @@ write.csv(prot.vip.sig.cut.2,
 # 需要绘制图片和列出的蛋白质
 feature <- prot.vip.sig.cut$feature
 feature2 <- prot.vip.sig.cut.2$gname
+all.feature <- lm.result$feature
+
+################################################################################
+# 查找重复ID
+for (i in 1:length(all.feature)) {
+  
+  if (all.feature[i] %in% all.feature[-i]) {
+    print(all.feature[i])
+  }
+  
+}
+################################################################################
 
 # 准备数据
 prot.orig <- read.csv(file = "final/Metab_data_processed_t.csv",stringsAsFactors = F)
 # 均值和SD
-mean <- aggregate(prot.orig[feature],by=list(ter=prot.orig$group),mean,na.rm=T)
-sd <- aggregate(prot.orig[feature],by=list(ter=prot.orig$group),sd,na.rm=T)
+mean <- aggregate(prot.orig[all.feature],by=list(ter=prot.orig$group),mean,na.rm=T)
+sd <- aggregate(prot.orig[all.feature],by=list(ter=prot.orig$group),sd,na.rm=T)
+
+mean.col <- colnames(mean)
+
+################################################################################
+# 查找重复ID
+for (i in 1:length(mean.col)) {
+  
+  if (mean.col[i] %in% mean.col[-i]) {
+    print(mean.col[i])
+  }
+  
+}
+################################################################################
 
 write.csv(mean,file = "final/差异蛋白平均值.csv",row.names=F)
 
 write.csv(sd,file = "final/差异蛋白标准差.csv",row.names=F)
 
+# 导出的平均值数据，在Excel里面转置，计算FC，再重新导入
 
+mean.fc <- read.csv(file = "final/差异蛋白平均值 - fc.csv",stringsAsFactor=F)
+mean.fc <- mean.fc %>%
+  select(feature=ter,fc=fc)
+
+mean.fc.prot <- inner_join(mean.fc,prot.vip.sig,by="feature")
+
+prot.vip.sig.cut.3 <- mean.fc.prot %>%
+  filter(vip>2 & fdr <0.1 &( fc>2 |fc<0.5))
+
+write.csv(prot.vip.sig.cut.3,
+          file = "final/VIP大于2且FDR小于0.1且fc大于2的蛋白质.csv",
+          row.names = F)
 ################################################################################
 # 在Excel 中调整数据格式，画柱状图
 data.barp <- read.csv(file = "final/画图数据.csv",stringsAsFactors = F)
@@ -264,6 +317,43 @@ ggsave(filename = "final/蛋白质浓度图-VIP大于2且FDR小于0.05.svg",
        width = 10,
        height = 8,
        dpi = 75)
+
+################################################################################
+# 选择VIP>2且FDR<0.1且fc>2的蛋白质，在Excel 中调整数据格式，画柱状图
+data.barp <- read.csv(file = "final/画图数据.csv",stringsAsFactors = F)
+feature3 <- prot.vip.sig.cut.3$gname
+data.barp3 <- data.barp %>%
+  filter(feature %in% feature3)
+# 画图
+conc.protein3 <- ggplot(data=data.barp3)+
+  geom_bar(aes(x=as.factor(group),y=mean,fill=as.factor(group)),stat = "identity",width = 0.5,color="black")+
+  geom_errorbar(aes(x=as.factor(group), ymin=mean,ymax=mean+sd),
+                width=0.4, alpha=0.9)+
+  facet_wrap(~feature,scales = "free",nrow=3)+
+  scale_fill_grey(start = 0.4,end = 0.9,labels=c("Tertile 1", "Tertile 2", "Tertile 3"))+theme_minimal()+
+  theme(
+    strip.text = element_text(size=15),
+    panel.border  = element_rect(color = "black",
+                                 fill=NA),
+    axis.title = element_text(size=15),
+    axis.text = element_text(size=15),
+    legend.title = element_text(size=15),
+    legend.text = element_text(size=15),
+    legend.position = "bottom"
+  )+
+  xlab("Tertile of WAZ")+
+  ylab("One Ten Thousandth of Total Protein")+
+  labs(fill="Tertile of WAZ ")
+conc.protein3
+
+# 导出 SVG 图片
+ggsave(filename = "final/蛋白质浓度图-VIP大于2且FDR小于0.1且FC大于2.svg",
+       conc.protein3,
+       width = 12,
+       height = 8,
+       dpi = 75)
+
+###############################################################################
 
 ###############################################################################
 # 尝试做 boxplot，效果不是很好
