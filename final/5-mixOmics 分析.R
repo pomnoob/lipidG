@@ -56,4 +56,44 @@ plotIndiv(plsda.res, comp = 1:2,
           legend = TRUE,  background = background)
 
 p.vip <- vip(plsda.res)
-p.vip$
+########################################################################################
+# spls-da
+set.seed(2543) # for reproducibility
+# grid of possible keepX values that will be tested for each component
+list.keepX <- c(1:10, seq(20, 400, 10))
+
+tune.splsda.maBER <- tune.splsda(X, Y, ncomp = 5, validation = 'Mfold', folds = 10,
+                                    progressBar = TRUE, dist = 'mahalanobis.dist', measure = "BER",
+                                    test.keepX = list.keepX, nrepeat = 10) # ncomp=1
+
+tune.splsda.maAUC <- tune.splsda(X, Y, ncomp = 5, validation = 'Mfold', folds = 10,
+                                 progressBar = TRUE, dist = 'mahalanobis.dist', measure = "AUC",
+                                 test.keepX = list.keepX, nrepeat = 10) # ncomp=3
+
+tune.splsda.maoverall <- tune.splsda(X, Y, ncomp = 5, validation = 'Mfold', folds = 10,
+                                 progressBar = TRUE, dist = 'mahalanobis.dist', measure = "overall",
+                                 test.keepX = list.keepX, nrepeat = 10) # ncomp=4 # BEST so far
+
+tune.splsda.maxBER <- tune.splsda(X, Y, ncomp = 5, validation = 'Mfold', folds = 10,
+                                     progressBar = TRUE, dist = 'max.dist', measure = "BER",
+                                     test.keepX = list.keepX, nrepeat = 10) # ncomp=3
+
+tune.splsda.maxAUC <- tune.splsda(X, Y, ncomp = 5, validation = 'Mfold', folds = 10,
+                                  progressBar = TRUE, dist = 'max.dist', measure = "AUC",
+                                  test.keepX = list.keepX, nrepeat = 10) # ncomp=2
+set.seed(2543)
+tune.splsda.maxoverall <- tune.splsda(X, Y, ncomp = 5, validation = 'Mfold', folds = 10,
+                                  progressBar = TRUE, dist = 'max.dist', measure = "overall",
+                                  test.keepX = list.keepX, nrepeat = 10) # ncomp=1
+
+error <- tune.splsda.srbct$error.rate
+ncomp <- tune.splsda.maxoverall$choice.ncomp$ncomp # optimal number of components based on t-tests
+select.keepX <- tune.splsda.maxoverall$choice.keepX[1:ncomp]
+plot(tune.splsda.maxoverall, col = color.jet(5))
+
+splsda.srbct <- splsda(X, Y, ncomp = ncomp, keepX = select.keepX)
+plotIndiv(splsda.srbct, comp = c(1,2),
+          group = Y, ind.names = FALSE,
+          ellipse = TRUE, legend = TRUE,
+          title = 'sPLS-DA on SRBCT, comp 1 & 2')
+auc.splsda = auroc(splsda.srbct, roc.comp = 2)
