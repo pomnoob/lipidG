@@ -1,19 +1,18 @@
-# MetaboAnalystR
-## 安装
-install.packages("pacman")
+# 更改默认package安装路径
+myPaths <- .libPaths()   # get the paths
+myPaths <- c(myPaths[2], myPaths[1])  # switch them
+.libPaths(myPaths)  # reassign them
 
-library(pacman)
+# 增加安装路径
 
-pacman::p_load(c("impute", "pcaMethods", "globaltest", "GlobalAncova", 
-                 "Rgraphviz", "preprocessCore", "genefilter", "SSPA", 
-                 "sva", "limma", "KEGGgraph", "siggenes","BiocParallel", 
-                 "MSnbase", "multtest","RBGL","edgeR","fgsea"))
-### 以下代码执行后无法安装！！！！！！！！
+# myPaths <- .libPaths()
+
+# myPaths <- c(myPaths, ‘C:/CustomR’)
+
+# .libPaths(myPaths)  # add new path
+
 metanr_packages <- function(){
-  metr_pkgs <- c("impute", "pcaMethods", "globaltest", "GlobalAncova", 
-                 "Rgraphviz", "preprocessCore", "genefilter", "SSPA", 
-                 "sva", "limma", "KEGGgraph", "siggenes","BiocParallel", 
-                 "MSnbase", "multtest","RBGL","edgeR","fgsea","devtools","crmn","ctc")
+  metr_pkgs <- c("impute", "pcaMethods", "globaltest", "GlobalAncova", "Rgraphviz", "preprocessCore", "genefilter", "SSPA", "sva", "limma", "KEGGgraph", "siggenes","BiocParallel", "MSnbase", "multtest","RBGL","edgeR","fgsea","devtools","crmn")
   list_installed <- installed.packages()
   new_pkgs <- subset(metr_pkgs, !(metr_pkgs %in% list_installed[, "Package"]))
   if(length(new_pkgs)!=0){if (!requireNamespace("BiocManager", quietly = TRUE))
@@ -29,15 +28,6 @@ metanr_packages <- function(){
 
 metanr_packages()
 
-# Step 1: Install devtools
-
-library(devtools)
-# Step 2: Install MetaboAnalystR without documentation
 devtools::install_github("xia-lab/MetaboAnalystR", build = TRUE, build_vignettes = FALSE)
 
-# Step 2: Install MetaboAnalystR with documentation
-devtools::install_github("xia-lab/MetaboAnalystR", build = TRUE, build_vignettes = TRUE, build_manual =T)
-
-###################################################################################################
-###################################################################################################
-
+install_github("xia-lab/MetaboAnalystR", INSTALL_opts="--no-multiarch")
