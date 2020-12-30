@@ -15,7 +15,6 @@ for (i in 1:length(colna )) {
   
 }
 
-
 # 均值和SD
 mean <- aggregate(prot.orig[3:426],by=list(ter=prot.orig$group),mean,na.rm=T)
 sd <- aggregate(prot.orig[3:426],by=list(ter=prot.orig$group),sd,na.rm=T)
