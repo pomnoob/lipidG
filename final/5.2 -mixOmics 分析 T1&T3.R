@@ -154,6 +154,15 @@ write.csv(error.comp1,file = "final/splsda结果 comp1.csv",row.names = T)
 write.csv(error.comp2,file = "final/splsda结果 comp2.csv",row.names = T)
 write.csv(error.comp3,file = "final/splsda结果 comp3.csv",row.names = T)
 
+# 中途分析数据时需要重新导入数据
+library(tidyverse)
+error.comp1 <- read.csv(file = "final/splsda结果 comp1.csv",
+                        stringsAsFactors = F) %>%
+  rename(variable=X)
+error.comp2 <- read.csv(file = "final/splsda结果 comp2.csv",
+                        stringsAsFactors = F)
+error.comp3 <- read.csv(file = "final/splsda结果 comp3.csv",
+                        stringsAsFactors = F)
 ## 在Excel 中整理数据，重新导入画图
 error.all <- read.csv(file = "final/splsda error 结果汇总.csv")
 ggplot(data = error.all)+
@@ -163,7 +172,7 @@ ggplot(data = error.all)+
   facet_wrap(~class,scales="free",nrow = 1)
 
 # 上面代码画出来的图不太好看，error bar相对y坐标太长
-
+library(reshape2)
 # 做boxplot图
 # comp1
 error.comp1 <- error.comp1 %>%
