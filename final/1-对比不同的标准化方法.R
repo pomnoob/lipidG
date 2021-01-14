@@ -99,6 +99,12 @@ table(pomic.p$mix)
 pomic.pm <- pomic.p %>%
   filter(mix != 2)
 
+# 2021年1月14日，分析哈尔滨和郑州的样本发现重复性不太好
+# 可能是北京的样本有较大偏差，去掉北京的样本进行分析
+
+pomic.pm.exBJ <- pomic.pm %>%
+  filter(city!="北京")
+
 pomic.pm$twaz <- ntile(pomic.pm$waz,3)
 pomic.pmp <- pomic.pm %>%
   filter(!is.na(twaz))
@@ -108,7 +114,7 @@ pomic.expm <- pomic.pmp %>%
   rename(group=twaz)
 
 
-write.csv(pomic.expm,file = "WAZ T1toT3 all proteins no preterm not mixed feeding.csv",row.names = F)
+write.csv(pomic.expm,file = "final/WAZ T1toT3 all proteins no preterm not mixed feeding.csv",row.names = F)
 
 pomic.char <- pomic.pmp %>%
   select(id,475:501)

@@ -86,12 +86,7 @@ chisq.test(chi.edu) # p=0.00042
 # 合并数据
 prot_norm <- read.csv("final/Metab_data_normalized_t.csv",
                       stringsAsFactors = F)
-# 蛋白质去重
-prot_norm <- prot_norm %>%
-  select(-contains("25786"))
 
-prot_norm <- prot_norm %>%
-  dplyr::rename(id=sample)
 
 prot.all <- inner_join(prot_norm,pomic.char,by="id")
 
