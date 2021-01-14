@@ -105,6 +105,10 @@ pomic.pm <- pomic.p %>%
 pomic.pm.exBJ <- pomic.pm %>%
   filter(city!="北京")
 
+pomic.pm.exBJ$twaz <- ntile(pomic.pm.exBJ$waz,3)
+pomic.pmpBJ <- pomic.pm.exBJ %>%
+  filter(!is.na(twaz))
+
 pomic.pm$twaz <- ntile(pomic.pm$waz,3)
 pomic.pmp <- pomic.pm %>%
   filter(!is.na(twaz))
@@ -113,8 +117,13 @@ pomic.expm <- pomic.pmp %>%
   select(id,twaz,2:473) %>%
   rename(group=twaz)
 
+pomic.expmBJ <- pomic.pmpBJ %>%
+  select(id,twaz,2:473) %>%
+  rename(group=twaz)
+
 
 write.csv(pomic.expm,file = "final/WAZ T1toT3 all proteins no preterm not mixed feeding.csv",row.names = F)
+write.csv(pomic.expmBJ,file = "final/WAZ T1toT3 all proteins no preterm not mixed feeding excl BJ.csv",row.names = F)
 
 pomic.char <- pomic.pmp %>%
   select(id,475:501)
