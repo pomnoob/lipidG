@@ -154,6 +154,17 @@ write.csv(error.comp1,file = "final/splsda结果 comp1.csv",row.names = T)
 write.csv(error.comp2,file = "final/splsda结果 comp2.csv",row.names = T)
 write.csv(error.comp3,file = "final/splsda结果 comp3.csv",row.names = T)
 
+# 中途分析数据时需要重新导入数据
+library(tidyverse)
+error.comp1 <- read.csv(file = "final/splsda结果 comp1.csv",
+                        stringsAsFactors = F) %>%
+  rename(variable=X)
+error.comp2 <- read.csv(file = "final/splsda结果 comp2.csv",
+                        stringsAsFactors = F) %>%
+  rename(variable=X)
+error.comp3 <- read.csv(file = "final/splsda结果 comp3.csv",
+                        stringsAsFactors = F) %>%
+  rename(variable=X)
 ## 在Excel 中整理数据，重新导入画图
 error.all <- read.csv(file = "final/splsda error 结果汇总.csv")
 ggplot(data = error.all)+
@@ -163,20 +174,20 @@ ggplot(data = error.all)+
   facet_wrap(~class,scales="free",nrow = 1)
 
 # 上面代码画出来的图不太好看，error bar相对y坐标太长
-
+library(reshape2)
 # 做boxplot图
 # comp1
+# 如果是从文件直接导入数据，则不需要使用rownames_to_column
 error.comp1 <- error.comp1 %>%
-  rownames_to_column(var = "variable") %>%
-  dplyr::select(1:21)
+    dplyr::select(1:21)
 
 error.c1.melt <- melt(error.comp1,id.vars = "variable",
                       value.name = "AUC",
                       variable.name = "iter")
 error.c1.melt$comp <- rep("Component 1",380)
 # comp2
+# 如果是从文件直接导入数据，则不需要使用rownames_to_column
 error.comp2 <- error.comp2 %>%
-  rownames_to_column(var = "variable") %>%
   dplyr::select(1:21)
 
 error.c2.melt <- melt(error.comp2,id.vars = "variable",
@@ -185,7 +196,7 @@ error.c2.melt <- melt(error.comp2,id.vars = "variable",
 error.c2.melt$comp <- rep("Component 2",380)
 # comp3
 error.comp3 <- error.comp3 %>%
-  rownames_to_column(var = "variable") %>%
+  
   dplyr::select(1:21)
 
 error.c3.melt <- melt(error.comp3,id.vars = "variable",
@@ -200,7 +211,7 @@ error.melt.all <- error.melt.all %>%
   arrange(variable)
 error.melt.all <- error.melt.all %>%
   filter(variable <=60)
-
+# 对每个comp的feature个数进行highlight标记
 error.melt.all <- error.melt.all %>%
   mutate(type=case_when(variable==20&comp=="Component 1"~"Highlight",
                         variable==30&comp=="Component 2"~"Highlight",
@@ -214,11 +225,11 @@ variable.sel <- ggplot(data = error.melt.all)+
   facet_wrap(~comp,nrow = 1)+
   theme_minimal()+
   theme(
-    strip.text = element_text(size=15),
+    strip.text = element_text(size=20),
     panel.border  = element_rect(color = "black",
                                  fill=NA),
-    axis.title = element_text(size=15),
-    axis.text = element_text(size=15),
+    axis.title = element_text(size=20),
+    axis.text = element_text(size=20),
     legend.title = element_text(size=15),
     legend.text = element_text(size=15),
     legend.position = "none"
