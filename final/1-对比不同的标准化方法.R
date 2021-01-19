@@ -99,6 +99,10 @@ table(pomic.p$mix)
 pomic.pm <- pomic.p %>%
   filter(mix != 2)
 
+write.csv(pomic.pm, 
+          file = "final/proteome data with z score.csv",
+          row.names = F)
+
 # 2021年1月14日，分析哈尔滨和郑州的样本发现重复性不太好
 # 可能是北京的样本有较大偏差，去掉北京的样本进行分析
 
@@ -120,6 +124,7 @@ pomic.expm <- pomic.pmp %>%
 pomic.expmBJ <- pomic.pmpBJ %>%
   select(id,twaz,2:473) %>%
   rename(group=twaz)
+
 
 
 write.csv(pomic.expm,file = "final/WAZ T1toT3 all proteins no preterm not mixed feeding.csv",row.names = F)
