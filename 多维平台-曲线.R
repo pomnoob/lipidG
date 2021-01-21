@@ -19,3 +19,10 @@ data <- data %>%
          )
 ggplot(data)+geom_line(aes(x,y),color="black")
 write.csv(data,file = "商品3点.csv")
+
+data2 <- data.frame(x)
+data2 <- data2 %>%
+  mutate(y = case_when(x<=10~1+3/20*x,
+                       x>10~(176*x+2960)/(11*x+1778)
+  )
+  )
